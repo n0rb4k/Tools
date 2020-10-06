@@ -30,7 +30,6 @@ for host in $(cat $1); do
   # Now it time to parse the opened ports to perform a thorough next scan
   # First we have to check if any port is opened in the simple scan performed
   opened_counter=$(grep -c "/open" $host"/simple/simple.gnmap")
-  echo $opened_counter
   if [ $opened_counter -gt 0 ];then
     simple_ports=$(grep -o -E "[0-9]{1,5}/open" $host"/simple/simple.gnmap" | tr -d "/open" | xargs -I {} echo -n {},)
     simple_ports=${simple_ports::-1} # Deleting the last ','
