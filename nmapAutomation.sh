@@ -27,7 +27,8 @@ for host in $(cat $1); do
   echo
   nmap -Pn $host -oA $host"/simple/simple"
   # Now it time to parse the opened ports to perform a thorough next scan
-  if [ $(test -f $host"/simple/simple.gnmap") -ne 1 ]; then
+  test -f $host"/simple/simple.gnmap"
+  if [ $? -ne 1 ]; then
     simple_ports=$(grep -o -E "[0-9]{1,5}/open" $host"/simple/simple.gnmap" | tr -d "/open" | xargs -I {} echo -n {},)
     simple_ports=${simple_ports::-1} # Deleting the last ','
   fi
@@ -51,7 +52,8 @@ for host in $(cat $1); do
   echo "Command: nmap -Pn -p- ${host} -oA ${host}/full/full"
   echo
   nmap -Pn -p- $host -oA $host"/full/full"
-  if [ $(test -f $host"/full/full.gnmap") -ne 1 ]; then
+  test -f $host"/full/full.gnmap"
+  if [ $? -ne 1 ]; then
     # Now it time to parse the opened ports to perform a thorough next scan
     full_ports=$(grep -o -E "[0-9]{1,5}/open" $host"/full/full.gnmap" | tr -d "/open" | xargs -I {} echo -n {},)
     full_ports=${full_ports::-1} # Deleting the last ','
