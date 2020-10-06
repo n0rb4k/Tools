@@ -26,25 +26,32 @@ for host in $(cat $1); do
   echo "Command: nmap -Pn ${host} -oA ${host}/simple/simple"
   echo
   nmap -Pn $host -oA $host"/simple/simple"
+
   # Now it time to parse the opened ports to perform a thorough next scan
-  test -f $host"/simple/simple.gnmap"
-  if [ $? -ne 1 ]; then
+  # First we have to check if any port is opened in the simple scan performed
+  opened_counter=$(grep -c "/open" $host"/simple/simple.gnmap")
+  echo $opened_counter
+  if [ $opened_counter -gt 0 ];then
     simple_ports=$(grep -o -E "[0-9]{1,5}/open" $host"/simple/simple.gnmap" | tr -d "/open" | xargs -I {} echo -n {},)
     simple_ports=${simple_ports::-1} # Deleting the last ','
-  fi
-  echo
-  echo
-  echo
+    echo
+    echo
+    echo
 
-  mkdir $host"/simple-scans"
-  echo "Scan: Simple with scripts/version"
-  echo "Host: "$host
-  echo "Command: nmap -Pn -sC -sV -p ${simple_ports} ${host} -oA ${host}/simple-scans"
-  echo
-  nmap -Pn -sC -sV -p $simple_ports $host -oA $host"/simple-scans/simple-scans"
-  echo
-  echo
-  echo
+    mkdir $host"/simple-scans"
+    echo "Scan: Simple with scripts/version"
+    echo "Host: "$host
+    echo "Command: nmap -Pn -sC -sV -p ${simple_ports} ${host} -oA ${host}/simple-scans"
+    echo
+    nmap -Pn -sC -sV -p $simple_ports $host -oA $host"/simple-scans/simple-scans"
+    echo
+    echo
+    echo
+  else
+    echo
+    echo "[*] Simple Scan has not found any opened ports, skipping the scripts part"
+    echo
+  fi
 
   mkdir $host"/full"
   echo "Scan: Full without scripts/version"
@@ -52,25 +59,30 @@ for host in $(cat $1); do
   echo "Command: nmap -Pn -p- ${host} -oA ${host}/full/full"
   echo
   nmap -Pn -p- $host -oA $host"/full/full"
-  test -f $host"/full/full.gnmap"
-  if [ $? -ne 1 ]; then
-    # Now it time to parse the opened ports to perform a thorough next scan
+  # Now it time to parse the opened ports to perform a thorough next scan
+  # First we have to check if any port is opened in the simple scan performed
+  opened_counter=$(grep -c "/open" $host"/full/full.gnmap")
+  if [ $opened_counter -gt 0 ];then
     full_ports=$(grep -o -E "[0-9]{1,5}/open" $host"/full/full.gnmap" | tr -d "/open" | xargs -I {} echo -n {},)
     full_ports=${full_ports::-1} # Deleting the last ','
-  fi
-  echo
-  echo
-  echo
+    echo
+    echo
+    echo
 
-  mkdir $host"/full-scripts"
-  echo "Scan: Full with scripts/version"
-  echo "Host: "$host
-  echo "Command: nmap -Pn -p ${full_ports} ${host} -oA ${host}/full-scripts/full-scripts"
-  echo
-  nmap -Pn -sC -sV -p $full_ports $host -oA $host"/full-scripts/full-scripts"
-  echo
-  echo
-  echo
+    mkdir $host"/full-scripts"
+    echo "Scan: Full with scripts/version"
+    echo "Host: "$host
+    echo "Command: nmap -Pn -p ${full_ports} ${host} -oA ${host}/full-scripts/full-scripts"
+    echo
+    nmap -Pn -sC -sV -p $full_ports $host -oA $host"/full-scripts/full-scripts"
+    echo
+    echo
+    echo
+  else
+    echo
+    echo "[*] Full Scan has not found any opened ports, skipping the scripts part"
+    echo
+  fi
 
   mkdir $host"/os-detection"
   echo "Scan: OS Detection"
@@ -91,5 +103,5 @@ for host in $(cat $1); do
 done
 
 # In order to get only the more relevant information, we're deleting all the files .gnmap and .xml
-find . -name "*.gnmap" -exec rm {} \;
-find . -name "*.xml" -exec rm {} \;
+#find . -name "*.gnmap" -exec rm {} \;
+#find . -name "*.xml" -exec rm {} \;
