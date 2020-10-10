@@ -102,5 +102,5 @@ for host in $(cat $1); do
 done
 
 # In order to get only the more relevant information, we're deleting all the files .gnmap and .xml
-#find . -name "*.gnmap" -exec rm {} \;
-#find . -name "*.xml" -exec rm {} \;
+find . -name "*.gnmap" -exec rm {} \;
+find . -name "*.xml" -exec rm {} \;
